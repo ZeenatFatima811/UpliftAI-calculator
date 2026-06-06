@@ -1,12 +1,18 @@
 import { useState } from 'react'
 import './App.css'
+import MicButton from "./components/MicButton";
+import DisplayBox from './components/DisplayBox';
 
-function App() {
+export default function App() {
   return (
-    <>
-      <h1>Welcome to the App!</h1>
-    </>
-  )
-}
+    <div className="min-h-screen bg-gradient-to-r from-pink-200 to-blue-200 flex flex-col items-center justify-center">
 
-export default App
+      <h1 className="text-4xl font-bold text-purple-700 mb-8">
+        🎤 Kids Voice Calculator
+      </h1>
+
+      {/* Display Box */}
+      <DisplayBox/>
+    </div>
+  );
+}
