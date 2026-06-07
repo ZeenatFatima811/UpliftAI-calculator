@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { speechToText } from "../services/upliftSpeechToText";
+import { convertToExpression, convertToEnglish } from "../services/llama";
 
 export default function useRecorder(onResult) {
   const [recording, setRecording] = useState(false);
@@ -38,6 +39,7 @@ export default function useRecorder(onResult) {
 
           // Send audio to Uplift AI
           const text = await speechToText(audioBlob);
+          
 
           console.log("Speech to Text:", text);
 

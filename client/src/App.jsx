@@ -1,22 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MicButton from "./components/MicButton";
 import DisplayBox from "./components/DisplayBox";
 import ResultBox from "./components/ResultBox";
 import useRecorder from "./hooks/useRecorder";
 import { calculateExpression } from "./services/calculator";
 import { textToSpeech } from "./services/upliftTextToSpeech";
+import { convertToEnglish, convertToExpression } from "./services/llama";
 
 export default function App() {
   const [text, setText] = useState("");
   const [result, setResult] = useState("");
+  const [expression, setExpression] = useState("");
 
   const handleResult = async (spokenText) => {
     setText(spokenText);
 
-    const res = calculateExpression(spokenText);
-    setResult(res);
+    const transcript = await convertToExpression(spokenText);
 
-    await textToSpeech(`The answer is ${res}`);
+    console.log("Converted Expression:", transcript);
+
+    setExpression(transcript || "");
+
+    console.log("setExpression ->", transcript);
+
+    const res = calculateExpression(transcript);
+
+    const englishNumber = await convertToEnglish(res);
+    console.log("English Number:", englishNumber);
+
+    setResult(englishNumber);
+
+    await textToSpeech(`${englishNumber}`);
   };
 
   const { startRecording, stopRecording, recording } =
@@ -31,7 +45,7 @@ export default function App() {
 
       <div className="bg-white w-80 p-6 rounded-2xl shadow-xl text-center">
 
-        <DisplayBox text={text} />
+        <DisplayBox text={text} expression={expression} />
 
         <ResultBox result={result} />
 

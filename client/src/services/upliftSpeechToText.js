@@ -15,7 +15,7 @@ export async function speechToText(audioBlob) {
     );
 
     if (!res.ok) {
-      const err = await res.text();
+      const err = await res.text();;
       console.error("STT Error:", err);
       return null;
     }
