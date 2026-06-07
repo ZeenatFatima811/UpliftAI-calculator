@@ -1,20 +1,23 @@
+import Groq from "groq-sdk";
+
+const groq = new Groq({
+  apiKey: import.meta.env.VITE_GROQ_API_KEY,
+  dangerouslyAllowBrowser: true,
+});
+
 export async function convertToExpression(text) {
   try {
-    const res = await fetch("http://localhost:11434/api/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "llama3",
-        prompt: `
-You are a math converter.
-
-Convert Urdu or English spoken math into ONLY a valid expression.
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "user",
+          content: `
+Convert Urdu or English spoken math into ONLY a valid mathematical expression.
 
 Rules:
-- Output ONLY expression
+- Return ONLY the expression
 - No explanation
+- No extra text
 
 Examples:
 دو جمع تین => 2 + 3
@@ -22,64 +25,59 @@ Examples:
 ten plus five => 10 + 5
 
 Input: ${text}
-Output:
-        `,
-        stream: false,
-      }),
+          `,
+        },
+      ],
+      model: "llama-3.3-70b-versatile",
     });
 
-    const data = await res.json();
+    let output =
+      chatCompletion.choices[0]?.message?.content?.trim() || "";
 
-    let output = data.response.trim();
-
-    // safety cleanup
-    output = output.replace(/[^0-9+\-*/().\s]/g, "");
+    output = output.replace(/[^0-9+\-*/().\s]/g, "").trim();
 
     return output;
   } catch (err) {
-    console.error("Ollama error:", err);
+    console.error("Groq Error:", err);
     return null;
   }
 }
 
-
-
 export async function convertToEnglish(text) {
   try {
-    const res = await fetch("http://localhost:11434/api/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "llama3",
-        prompt: `
-You are a number to English converter.
-
-Convert the number into English words only.
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "user",
+          content: `
+Convert the number into English words.
 
 Rules:
-- ONLY English words
+- Output ONLY English words
 - No explanation
 - No labels
 
+Examples:
+1 => one
+5 => five
+21 => twenty one
+100 => one hundred
+
 Input: ${text}
-Output:
-        `,
-        stream: false,
-      }),
+          `,
+        },
+      ],
+      model: "llama-3.3-70b-versatile",
     });
 
-    const data = await res.json();
+    let output =
+      chatCompletion.choices[0]?.message?.content?.trim() || "";
 
-    let output = data.response.trim();
-
-    // remove model noise
-    output = output.replace(/Output:/i, "").trim();
+    output = output.replace(/Output:/gi, "").trim();
 
     return output;
   } catch (err) {
-    console.error("Ollama error:", err);
+    console.error("Groq Error:", err);
     return null;
   }
 }
