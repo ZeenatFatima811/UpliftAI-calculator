@@ -1,10 +1,32 @@
-import React from 'react'
+// export default function MicButton({ onStart, onStop, recording }) {
+//   return (
+//     <button
+//       onClick={recording ? onStop : onStart}
+//       className={`p-5 rounded-full text-white text-2xl ${
+//         recording ? "bg-red-500" : "bg-purple-600"
+//       }`}
+//     >
+//       🎤
+//     </button>
+//   );
+// }
 
-export default function MicButton({ onClick }) {
+
+export default function MicButton({ onStart, onStop, recording }) {
   return (
     <button
-      onClick={onClick}
-      className="bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-full text-2xl"
+      onClick={() => {
+        console.log("Button clicked");
+
+        if (recording) {
+          onStop();
+        } else {
+          onStart();
+        }
+      }}
+      className={`p-5 rounded-full text-white text-2xl ${
+        recording ? "bg-red-500" : "bg-purple-600"
+      }`}
     >
       🎤
     </button>
